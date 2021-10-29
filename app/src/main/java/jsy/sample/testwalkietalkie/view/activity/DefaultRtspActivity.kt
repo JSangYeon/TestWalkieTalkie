@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import com.pedro.encoder.input.video.CameraOpenException
 import com.pedro.rtplibrary.rtsp.RtspCamera1
+import com.pedro.rtsp.rtsp.VideoCodec
 import com.pedro.rtsp.utils.ConnectCheckerRtsp
 import jsy.sample.testwalkietalkie.R
 import jsy.sample.testwalkietalkie.databinding.ActivityDefaultRtspBinding
@@ -45,6 +46,7 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
         val surfaceView = binding.svDefaultRtspCamera
         rtspCamera1 = RtspCamera1(surfaceView, DefaultRtspConnectChecker())
         rtspCamera1.setReTries(10)
+        rtspCamera1.setVideoCodec(VideoCodec.H265);
         _rtspViewModel.setRtspCamera1(rtspCamera1)
         surfaceView.holder.addCallback(
             DefaultRtspSurfaceHolderCallback()
