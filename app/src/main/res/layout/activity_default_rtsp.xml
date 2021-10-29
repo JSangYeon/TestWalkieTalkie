@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <data>
+        <variable
+            name="defaultRtspActivity"
+            type="jsy.sample.testwalkietalkie.view.activity.DefaultRtspActivity" />
+        <variable
+            name="rtspViewModel"
+            type="jsy.sample.testwalkietalkie.view.model.RtspViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".view.activity.DefaultRtspActivity">
+
+
+        <SurfaceView
+            android:id="@+id/sv_default_rtsp_camera"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <EditText
+            android:id="@+id/et_default_rtsp_url"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="rtsp://~~"
+            android:textColorHint="@color/appColor"
+            android:textColor="@color/appColor"
+            android:layout_marginTop="20dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <Button
+            android:id="@+id/btn_start_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="start\nRecord"
+            android:textSize="12sp"
+            android:onClick="@{() -> defaultRtspActivity.btnRecord()}"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Button
+            android:id="@+id/btn_start_streaming"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="start\nstreaming"
+            android:textSize="12sp"
+            android:onClick="@{() -> defaultRtspActivity.btnStreaming()}"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toEndOf="@+id/btn_start_record"
+            app:layout_constraintTop_toTopOf="@+id/btn_start_record" />
+
+        <Button
+            android:id="@+id/btn_switch_carmera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="switch\ncamera"
+            android:textSize="12sp"
+            android:onClick="@{() -> defaultRtspActivity.switchCamera()}"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toEndOf="@+id/btn_start_streaming"
+            app:layout_constraintTop_toTopOf="@+id/btn_start_record" />
+
+
+        <Button
+            android:id="@+id/btn_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="pause"
+            app:layout_constraintStart_toStartOf="@id/btn_start_record"
+            app:layout_constraintBottom_toTopOf="@id/btn_start_record"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
