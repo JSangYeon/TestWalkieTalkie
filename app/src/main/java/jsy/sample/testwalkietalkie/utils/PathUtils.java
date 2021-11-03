@@ -37,7 +37,7 @@ public class PathUtils {
 
   public static File getRecordPath(Context context) {
     return new File(context.getExternalFilesDir(null).getAbsolutePath()
-        + "/rtmp-rtsp-stream-client-java");
+        + "/recordFiles");
   }
 
   public static String getPath(final Context context, final Uri uri) {

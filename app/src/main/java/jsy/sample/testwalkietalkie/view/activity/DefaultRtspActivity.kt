@@ -16,6 +16,8 @@ import jsy.sample.testwalkietalkie.utils.PathUtils
 import jsy.sample.testwalkietalkie.view.base.BaseActivity
 import jsy.sample.testwalkietalkie.view.model.RtspViewModel
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.activity_default_rtsp) {
 
@@ -25,8 +27,6 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
     private lateinit var rtspCamera1: RtspCamera1
 
     private lateinit var context : Context
-    private var currentDateAndTime = "";
-    private lateinit var folder : File
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,17 +46,19 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
         val surfaceView = binding.svDefaultRtspCamera
         rtspCamera1 = RtspCamera1(surfaceView, DefaultRtspConnectChecker())
         rtspCamera1.setReTries(10)
-        rtspCamera1.setVideoCodec(VideoCodec.H265);
+        rtspCamera1.setVideoCodec(VideoCodec.H265)
+
         _rtspViewModel.setRtspCamera1(rtspCamera1)
         surfaceView.holder.addCallback(
             DefaultRtspSurfaceHolderCallback()
         )
-         folder = PathUtils.getRecordPath(this)
+
+        _rtspViewModel.folder =  PathUtils.getRecordPath(this)
 
         _rtspViewModel.recordStarting.observe(binding.lifecycleOwner!!,{recording->
             when(recording) {
-                true -> binding.btnStartStreaming.text = getString(R.string.stop_record)
-                false -> binding.btnStartStreaming.text = getString(R.string.start_record)
+                true -> binding.btnStartRecord.text = getString(R.string.stop_record)
+                false -> binding.btnStartRecord.text = getString(R.string.start_record)
             }
         })
 
@@ -66,7 +68,6 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
                 false -> binding.btnStartStreaming.text = getString(R.string.start_button)
             }
         })
-
 
 
 
@@ -81,47 +82,6 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
         }
     }
 
-
-    fun btnRecord(){
-        if (!rtspCamera1.isStreaming) {
-            if (rtspCamera1.isRecording
-                || rtspCamera1.prepareAudio() && rtspCamera1.prepareVideo()
-            ) {
-                _rtspViewModel.streamingStart(binding.etDefaultRtspUrl.text.toString())
-            } else {
-                Toast.makeText(
-                    this, "Error preparing stream, This device cant do it",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        } else {
-            _rtspViewModel.streamingStop()
-        }
-
-    }
-
-    fun btnStreaming(){
-        Log.d("btnStreaming","1")
-        if (!rtspCamera1.isStreaming) {
-            Log.d("btnStreaming","2")
-            if (rtspCamera1.isRecording
-                || rtspCamera1.prepareAudio() && rtspCamera1.prepareVideo()
-            ) {
-                Log.d("btnStreaming","3")
-                _rtspViewModel.streamingStart(binding.etDefaultRtspUrl.text.toString())
-            } else {
-                Log.d("btnStreaming","4")
-                Toast.makeText(
-                    this, "Error preparing stream, This device cant do it",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        } else {
-            Log.d("btnStreaming","5")
-            _rtspViewModel.streamingStop()
-        }
-
-    }
 
 
 
@@ -139,10 +99,10 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
                 _rtspViewModel.recordStop()
             Toast.makeText(
                 context,
-                "file " + currentDateAndTime + ".mp4 saved in " + folder.getAbsolutePath(),
+                "file " + _rtspViewModel.currentDateAndTime + ".mp4 saved in " + _rtspViewModel.folder?.getAbsolutePath(),
                 Toast.LENGTH_SHORT
             ).show()
-            currentDateAndTime = ""
+                _rtspViewModel.currentDateAndTime = ""
             }
             if (rtspCamera1.isStreaming) {
                 _rtspViewModel.streamingStop()

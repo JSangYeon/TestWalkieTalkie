@@ -28,6 +28,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:hint="rtsp://~~"
+            android:text="@={rtspViewModel.url}"
             android:textColorHint="@color/appColor"
             android:textColor="@color/appColor"
             android:layout_marginTop="20dp"
@@ -41,7 +42,7 @@
             android:layout_marginBottom="20dp"
             android:text="start\nRecord"
             android:textSize="12sp"
-            android:onClick="@{() -> defaultRtspActivity.btnRecord()}"
+            android:onClick="@{() -> rtspViewModel.btnRecord()}"
             android:layout_marginStart="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -53,7 +54,7 @@
             android:layout_marginBottom="20dp"
             android:text="start\nstreaming"
             android:textSize="12sp"
-            android:onClick="@{() -> defaultRtspActivity.btnStreaming()}"
+            android:onClick="@{() -> rtspViewModel.btnStreaming()}"
             android:layout_marginStart="10dp"
             app:layout_constraintStart_toEndOf="@+id/btn_start_record"
             app:layout_constraintTop_toTopOf="@+id/btn_start_record" />
