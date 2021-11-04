@@ -10,4 +10,15 @@
     <string name="stop_record">Stop record</string>
 
     <string name="switch_camera_button">Switch camera</string>
+
+    <string name="plz_prepare_stream">"Error preparing stream, This device can't do it"</string>
+
+    <string name="connection_started">Connection started</string>
+    <string name="connection_success">Connection success</string>
+    <string name="connection_failed">Connection failed</string>
+    <string name="retry">retry</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="auth_success">Auth success</string>
+    <string name="auth_error">Auth error</string>
+
 </resources>

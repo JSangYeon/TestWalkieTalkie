@@ -20,14 +20,10 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
         Manifest.permission.RECORD_AUDIO, Manifest.permission.CAMERA,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
-    override fun onCreate(icicle: Bundle?) {
-        super.onCreate(icicle)
 
-        binding.apply {
-            ActivityCompat.requestPermissions(this@MainActivity, permissions, 1)
-
-            mainActivity = this@MainActivity
-        }
+    override fun ActivityMainBinding.init() {
+        ActivityCompat.requestPermissions(this@MainActivity, permissions, 1)
+        mainActivity = this@MainActivity
     }
 
     fun btnDefaultRtsp() {
@@ -50,13 +46,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
         return true;
     }
-
-
-
-
-
-
-
 
 
 

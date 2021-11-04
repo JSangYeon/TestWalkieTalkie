@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:text="switch\ncamera"
             android:textSize="12sp"
-            android:onClick="@{() -> defaultRtspActivity.switchCamera()}"
+            android:onClick="@{() -> rtspViewModel.switchCamera()}"
             android:layout_marginStart="10dp"
             app:layout_constraintStart_toEndOf="@+id/btn_start_streaming"
             app:layout_constraintTop_toTopOf="@+id/btn_start_record" />

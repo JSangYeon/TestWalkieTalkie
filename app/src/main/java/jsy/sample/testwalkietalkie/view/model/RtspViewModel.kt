@@ -1,15 +1,14 @@
 package jsy.sample.testwalkietalkie.view.model
 
+import android.os.Looper
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.pedro.encoder.input.video.CameraOpenException
 import com.pedro.rtplibrary.rtsp.RtspCamera1
-import jsy.sample.testwalkietalkie.utils.PathUtils
+import jsy.sample.testwalkietalkie.messageEnum.ToastEnum
 import java.io.File
-import java.io.FileDescriptor
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
@@ -31,9 +30,14 @@ class RtspViewModel : ViewModel() {
         }
     }
 
+    var customMessage : String? = null
+    set(value) {
+        field = value
+        setToastEnum(ToastEnum.CustomMessage)
+    }
+
+
     var currentDateAndTime = "";
-
-
 
     val url = MutableLiveData<String>()
 
@@ -45,10 +49,15 @@ class RtspViewModel : ViewModel() {
     val streamingStatus : LiveData<Boolean>
         get() = _streamingStatus
 
+    private val _toastEnum = MutableLiveData<ToastEnum>()
+    val toastEnum : LiveData<ToastEnum>
+        get() = _toastEnum
+
 
     init {
         _recordStatus.value = false
         _streamingStatus.value = false
+        setToastEnum(ToastEnum.None)
         url.value = "rtsp://218.153.121.119:8554/jsy/test"
     }
 
@@ -96,12 +105,9 @@ class RtspViewModel : ViewModel() {
                 ) {
                     recordStart(folder!!.absolutePath + "/" + currentDateAndTime + ".mp4")
                 }
-//                else {
-//                    Toast.makeText(
-//                        this, "Error preparing stream, This device cant do it",
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-//                }
+                else {
+                    setToastEnum(ToastEnum.PlzPrepareStream)
+                }
             } else {
                 recordStart(folder!!.absolutePath + "/" + currentDateAndTime + ".mp4")
             }
@@ -118,16 +124,12 @@ class RtspViewModel : ViewModel() {
         if (!rtspCamera!!.isStreaming) {
             Log.d("btnStreaming","2")
             if (rtspCamera!!.isRecording
-                || rtspCamera!!.prepareAudio() && rtspCamera!!.prepareVideo()
-            ) {
+                || rtspCamera!!.prepareAudio() && rtspCamera!!.prepareVideo()) {
                 Log.d("btnStreaming","url : ${url.value}")
                 streamingStart(url.value!!)
             } else {
                 Log.d("btnStreaming","4")
-//                Toast.makeText(
-//                    this, "Error preparing stream, This device cant do it",
-//                    Toast.LENGTH_SHORT
-//                ).show()
+                setToastEnum(ToastEnum.PlzPrepareStream)
             }
         } else {
             Log.d("btnStreaming","5")
@@ -135,6 +137,25 @@ class RtspViewModel : ViewModel() {
         }
 
     }
+
+    fun switchCamera() {
+        try {
+            rtspCamera!!.switchCamera()
+
+        } catch (e: CameraOpenException) {
+            customMessage = e.message.toString()
+        }
+    }
+
+
+    fun setToastEnum(toastEnum: ToastEnum){
+        when(Looper.myLooper())
+        {
+            Looper.getMainLooper() -> _toastEnum.value = toastEnum
+            else -> _toastEnum.postValue(toastEnum)
+        }
+    }
+
 
 
 }
