@@ -28,19 +28,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>(R.layout.activity_main) {
 
     fun btnDefaultRtsp() {
         if(checkPermissions()) {
-            val intent = Intent(this, DefaultRtspActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this, DefaultRtspActivity::class.java))
         }
-
     }
 
-    fun checkPermissions(): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            for (permission in permissions) {
-                if (ActivityCompat.checkSelfPermission(this, permission)
-                    != PackageManager.PERMISSION_GRANTED) {
-                    return false;
-                }
+    fun btnMedia(){
+        startActivity(Intent(this, MediaActivity::class.java))
+    }
+
+
+    private fun checkPermissions(): Boolean {
+        for (permission in permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission)
+                != PackageManager.PERMISSION_GRANTED) {
+                return false;
             }
         }
 

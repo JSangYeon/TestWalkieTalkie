@@ -26,6 +26,16 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"/>
 
+        <Button
+            android:id="@+id/btn_media_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="@{() -> mainActivity.btnMedia()}"
+            android:text="media"
+            app:layout_constraintTop_toBottomOf="@id/btn_default_rtsp"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
