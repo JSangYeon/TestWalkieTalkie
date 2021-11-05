@@ -1,7 +1,6 @@
 package jsy.sample.testwalkietalkie.application
 
 import android.app.Application
-import android.content.Context
 
 class MyApplication : Application() {
 

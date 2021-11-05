@@ -7,9 +7,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.pedro.encoder.input.video.CameraOpenException
 import com.pedro.rtplibrary.rtsp.RtspCamera1
+import jsy.sample.testwalkietalkie.R
+import jsy.sample.testwalkietalkie.application.MyApplication
 import jsy.sample.testwalkietalkie.messageEnum.ToastEnum
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.StringBuilder
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -22,8 +25,6 @@ class RtspViewModel : ViewModel() {
 
     var folder : File? = null
     set(value) {
-        Log.d("파일테스트","setFolder")
-
         field = value
         if (!field!!.exists()) {
             field!!.mkdir()
@@ -58,11 +59,11 @@ class RtspViewModel : ViewModel() {
         _recordStatus.value = false
         _streamingStatus.value = false
         setToastEnum(ToastEnum.None)
-        url.value = "rtsp://218.153.121.119:8554/jsy/test"
+        url.value = MyApplication.instance.getString(R.string.rtsp_url)
     }
 
 
-    fun recordStart(temp: String){
+    private fun recordStart(temp: String){
         val file = File(temp)
         val fos = FileOutputStream(file)
         val fileDescriptor  = fos.fd
@@ -76,7 +77,7 @@ class RtspViewModel : ViewModel() {
         _recordStatus.value = false
     }
 
-    fun streamingStart(temp : String){
+    private fun streamingStart(temp : String){
         Log.d(LOG_TAG, "streamingStart : ${rtspCamera==null}")
         rtspCamera?.startStream(temp)
         _streamingStatus.value = true
@@ -99,17 +100,25 @@ class RtspViewModel : ViewModel() {
         if(!rtspCamera!!.isRecording)
         {
             val sdf = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+
             currentDateAndTime = sdf.format(Date())
+
+            val sb = StringBuilder()
+            sb.append(folder!!.absolutePath)
+            sb.append("/")
+            sb.append(currentDateAndTime)
+            sb.append(".mp4")
+
             if (!rtspCamera!!.isStreaming) {
                 if (rtspCamera!!.prepareAudio() && rtspCamera!!.prepareVideo()
                 ) {
-                    recordStart(folder!!.absolutePath + "/" + currentDateAndTime + ".mp4")
+                    recordStart(sb.toString())
                 }
                 else {
                     setToastEnum(ToastEnum.PlzPrepareStream)
                 }
             } else {
-                recordStart(folder!!.absolutePath + "/" + currentDateAndTime + ".mp4")
+                recordStart(sb.toString())
             }
         } else{
             recordStop()
@@ -120,19 +129,14 @@ class RtspViewModel : ViewModel() {
 
 
     fun btnStreaming(){
-        Log.d("btnStreaming","1")
         if (!rtspCamera!!.isStreaming) {
-            Log.d("btnStreaming","2")
             if (rtspCamera!!.isRecording
                 || rtspCamera!!.prepareAudio() && rtspCamera!!.prepareVideo()) {
-                Log.d("btnStreaming","url : ${url.value}")
                 streamingStart(url.value!!)
             } else {
-                Log.d("btnStreaming","4")
                 setToastEnum(ToastEnum.PlzPrepareStream)
             }
         } else {
-            Log.d("btnStreaming","5")
             streamingStop()
         }
 
@@ -149,11 +153,8 @@ class RtspViewModel : ViewModel() {
 
 
     fun setToastEnum(toastEnum: ToastEnum){
-        when(Looper.myLooper())
-        {
-            Looper.getMainLooper() -> _toastEnum.value = toastEnum
-            else -> _toastEnum.postValue(toastEnum)
-        }
+        if(Looper.getMainLooper().isCurrentThread) _toastEnum.value = toastEnum
+        else  _toastEnum.postValue(toastEnum)
     }
 
 

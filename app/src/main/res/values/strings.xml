@@ -11,6 +11,8 @@
 
     <string name="switch_camera_button">Switch camera</string>
 
+    <string name="rtsp_url">rtsp://218.153.121.119:8554/jsy/test</string>
+
     <string name="plz_prepare_stream">"Error preparing stream, This device can't do it"</string>
 
     <string name="connection_started">Connection started</string>
@@ -20,5 +22,7 @@
     <string name="disconnected">Disconnected</string>
     <string name="auth_success">Auth success</string>
     <string name="auth_error">Auth error</string>
+
+
 
 </resources>
