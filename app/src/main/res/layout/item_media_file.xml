@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
-            name="file"
-            type="java.io.File"/>
+            name="mediaFile"
+            type="jsy.sample.testwalkietalkie.data.MediaFile"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
+        android:layout_width="100dp"
         android:layout_height="wrap_content">
 
         <TextView
             android:id="@+id/tv_file_name"
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="match_parent"
-            android:text="@{file.name}"/>
+            android:text="@{mediaFile.file.name}"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <ImageView
+            android:id="@+id/iv_file_thumbnail"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/tv_file_name"
+            app:layout_constraintStart_toStartOf="parent"
+            />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

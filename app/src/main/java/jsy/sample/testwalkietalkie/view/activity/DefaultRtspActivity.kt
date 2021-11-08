@@ -35,7 +35,7 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
         val surfaceView = binding.svDefaultRtspCamera
         rtspCamera1 = RtspCamera1(surfaceView, DefaultRtspConnectChecker())
         rtspCamera1.setReTries(10)
-        rtspCamera1.setVideoCodec(VideoCodec.H265)
+        rtspCamera1.setVideoCodec(VideoCodec.H264)
 
         _rtspViewModel.setRtspCamera1(rtspCamera1)
         surfaceView.holder.addCallback(
