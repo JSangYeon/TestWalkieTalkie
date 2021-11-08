@@ -1,6 +1,8 @@
 package jsy.sample.testwalkietalkie.view.base
 
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import androidx.databinding.DataBindingUtil
@@ -25,6 +27,15 @@ abstract class BaseRecyclerView {
             }
         }
 
+        fun replaceAllArray(items: Array<ITEM>?) {
+            items?.let {
+                this.items.run {
+                    clear()
+                    addAll(it)
+                }
+            }
+        }
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             object : ViewHolder<B>(
                 layoutResId = layoutResId,
@@ -35,6 +46,7 @@ abstract class BaseRecyclerView {
         override fun getItemCount() = items.size
 
         override fun onBindViewHolder(holder: ViewHolder<B>, position: Int) {
+
             holder.onBindViewHolder(items[position])
         }
     }
@@ -42,14 +54,14 @@ abstract class BaseRecyclerView {
     abstract class ViewHolder<B : ViewDataBinding>(
         @LayoutRes layoutResId: Int,
         parent: ViewGroup,
-        private val bindingVariableId: Int?
+        val bindingVariableId: Int?
     ) : RecyclerView.ViewHolder(
         LayoutInflater.from(parent.context).inflate(layoutResId, parent, false)
     ) {
 
         protected val binding: B = DataBindingUtil.bind(itemView)!!
 
-        fun onBindViewHolder(item: Any?) {
+        open fun onBindViewHolder(item: Any?) {
             try {
                 bindingVariableId?.let {
                     binding.setVariable(it, item)

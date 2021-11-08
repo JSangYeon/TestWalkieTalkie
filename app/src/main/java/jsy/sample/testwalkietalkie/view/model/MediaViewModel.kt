@@ -15,6 +15,7 @@ class MediaViewModel : ViewModel() {
     val listFiles : LiveData<Array<File>?>
         get() = _listFiles
 
+
     init {
         _listFiles.value = null
     }
@@ -27,15 +28,18 @@ class MediaViewModel : ViewModel() {
             }
         }
 
-        if (dir.listFiles() != null) {
-            _listFiles.value = dir.listFiles()
-            for (f in _listFiles.value!!) {
-                Log.d(TAG, " aaaaaf : " + f.path.toString() + " , " + f.path.endsWith(".mp4"))
-            }
+        when(dir.listFiles())
+        {
+            null -> return
+            else -> {
+                _listFiles.value = dir.listFiles()!!
+                for(file in dir.listFiles()!!)
+                {
+                    Log.d(TAG, " aaaaaf : " + file.path.toString() + " , " + file.path.endsWith(".mp4"))
 
-            Log.d(TAG, "files not null ${_listFiles.value!!.size}");
-        } else {
-            Log.d(TAG, "files null");
+                }
+
+            }
         }
     }
 

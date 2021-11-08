@@ -13,4 +13,13 @@ abstract class BaseActivity<B : ViewDataBinding>(@LayoutRes private val layoutRe
     protected lateinit var binding: B
     protected lateinit var TAG: String
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, layoutResId)
+        binding.lifecycleOwner = this@BaseActivity
+        binding.init()
+
+    }
+
+    abstract fun B.init()
 }
