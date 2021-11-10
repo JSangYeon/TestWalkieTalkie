@@ -48,55 +48,40 @@ fun getMediaTimeLineList() : ArrayList<MediaTimeLine> {
 
     if(cal.time.time == getDateStartTime().time) // 앱 처음킨 시간에 들어왔을 때
     {
-        mediaTimeLineList.add(MediaTimeLine(cal, hourMinuteSimpleDateFormat().format(cal.time), timeCheck = true, startPoint = true, endPoint = true))
+        addMediaTimeLine(mediaTimeLineList, cal, startPoint = true, endPoint = true) // 현재시간
         return mediaTimeLineList
     }
 
 
 
-    var minuteGap = ((cal.time.time - getDateStartTime().time)/60000).toInt()
+    var minuteGap = ((cal.time.time - getDateStartTime().time)/60000).toInt() // 시작시간, 현재시간의 분 차이
 
-    var currentDateRestMinute = ((cal.time.time/60000)%30).toInt()
+    var currentDateRestMinute = ((cal.time.time/60000)%10).toInt() // 앞의 짜투리시간 제거 05분~ 07분 등
 
 
-    addMediaTimeLine(mediaTimeLineList, cal, timeCheck = true, startPoint = true, endPoint = false)
+    addMediaTimeLine(mediaTimeLineList, cal, startPoint = true, endPoint = false) // 현재시간
 
     if(minuteGap > currentDateRestMinute)
     {
-        if(currentDateRestMinute > 0) //현재시각 ~ 30분 or 현재시각 ~ 00분
+        if(currentDateRestMinute > 0) //가까운 10분대 단위 맞추기
         {
-            val restTime = currentDateRestMinute/10
-            if(restTime>0)
-            {
-                cal.add(Calendar.MINUTE, -restTime)
-                minuteGap -= restTime
-                currentDateRestMinute -= restTime
-                addMediaTimeLine(mediaTimeLineList, cal, timeCheck = false, startPoint = false, endPoint = false)
-            }
-
-            val index = currentDateRestMinute/10
-            for(i in 0 until index){
-                minuteGap -= 10
-                cal.add(Calendar.MINUTE, -10)
-                currentDateRestMinute -= 10
-                addMediaTimeLine(mediaTimeLineList, cal, timeCheck = false, startPoint = false, endPoint = false)
-            }
+                cal.add(Calendar.MINUTE, -currentDateRestMinute)
+                minuteGap -= currentDateRestMinute
+                currentDateRestMinute -= currentDateRestMinute
+                addMediaTimeLine(mediaTimeLineList, cal, startPoint = false, endPoint = false)
         }
 
-        while(minuteGap>30){
-            for(i in 0 until 3){
-                minuteGap -= 10 // 10분씩 체크하기
-                cal.add(Calendar.MINUTE, -10)
-                addMediaTimeLine(mediaTimeLineList, cal, timeCheck = false, startPoint = false, endPoint = false)
-            }
-
+        while(minuteGap>10){// 10분씩 체크
+            minuteGap -= 10
+            cal.add(Calendar.MINUTE, -10)
+            addMediaTimeLine(mediaTimeLineList, cal, startPoint = false, endPoint = false)
         }
     }
 
-    if(minuteGap>0)
+    if(minuteGap>0) // 시작시간
     {
         cal.add(Calendar.MINUTE,-minuteGap)
-        addMediaTimeLine(mediaTimeLineList, cal, timeCheck = true, startPoint = false, endPoint = true)
+        addMediaTimeLine(mediaTimeLineList, cal, startPoint = false, endPoint = true) // 시작시간
     }
 
     return mediaTimeLineList
@@ -105,9 +90,13 @@ fun getMediaTimeLineList() : ArrayList<MediaTimeLine> {
 
 
 
-private fun addMediaTimeLine(mediaTimeLineList : ArrayList<MediaTimeLine>, cal:Calendar, timeCheck:Boolean, startPoint:Boolean, endPoint:Boolean ){
+private fun addMediaTimeLine(mediaTimeLineList : ArrayList<MediaTimeLine>, cal:Calendar, startPoint:Boolean, endPoint:Boolean ){
 
-    mediaTimeLineList.add(MediaTimeLine(cal, hourMinuteSimpleDateFormat().format(cal.time), timeCheck, startPoint, endPoint))
+    var timeCheck = false;
+
+    if(startPoint||endPoint||cal.get(Calendar.MINUTE)%30 == 0) timeCheck = true
+
+    mediaTimeLineList.add(MediaTimeLine(cal, hourMinuteSimpleDateFormat().format(cal.time), startPoint, endPoint, timeCheck))
 
 }
 

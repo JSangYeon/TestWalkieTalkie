@@ -50,6 +50,10 @@ class MediaViewModel : ViewModel() {
 //            mediaTimeLineList.add(MediaTimeLine(calList[i],hourMinuteSimpleDateFormat().format(calList[i].time),startPoint,endPoint))
 //        }
 
+        val mediaTimeLineList = getMediaTimeLineList()
+
+
+
         _listMediaTimeLine.value = getMediaTimeLineList()
 
 //        val dir = PathUtils.recordPath
