@@ -12,9 +12,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import jsy.sample.testwalkietalkie.data.MediaFile
 import jsy.sample.testwalkietalkie.data.MediaTimeLine
+import jsy.sample.testwalkietalkie.utils.PathUtils
 import jsy.sample.testwalkietalkie.utils.getMediaTimeLineList
 import jsy.sample.testwalkietalkie.utils.getDateStartTime
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.attribute.BasicFileAttributes
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MediaViewModel : ViewModel() {
 
@@ -40,49 +45,93 @@ class MediaViewModel : ViewModel() {
     fun getFolderFileList() {
         Log.d("getDateStartTime", "date : ${getDateStartTime()}")
 
-//        val calList = getCalList()
-
-//        val mediaTimeLineList = ArrayList<MediaTimeLine>()
-//
-//        for(i in calList.indices) { //cal의 시간 분 범위안에 드는 파일들 다 넣어줘야함
-//            val startPoint = i==0
-//            val endPoint = i==calList.size-1
-//            mediaTimeLineList.add(MediaTimeLine(calList[i],hourMinuteSimpleDateFormat().format(calList[i].time),startPoint,endPoint))
-//        }
-
-        val mediaTimeLineList = getMediaTimeLineList()
-
-
-
         _listMediaTimeLine.value = getMediaTimeLineList()
+    }
 
-//        val dir = PathUtils.recordPath
+//    private fun getFileList(){
+//        val recordFileDir = PathUtils.recordPath
+//        Log.d(TAG, "Path : ${PathUtils.recordPath.name}")
+//        if (!recordFileDir.isDirectory) return
 //
+//        val mediaTimeLineList = getMediaTimeLineList()
 //
-//        if (!dir.isDirectory) {
-//            if (!dir.mkdirs()) {
-//                Log.d(TAG, " aaaaa")
+//        for(mediaTimeLine in mediaTimeLineList) {
+//            val date = mediaTimeLine.date
+//            val cal = Calendar.getInstance()
+//            cal.time = date
+//
+//            if(cal.get(Calendar.MINUTE)%10==0) cal.add(Calendar.MINUTE,-10)
+//
+//            val mediaFileDir = File(
+//                PathUtils.recordPath.absolutePath +"/" +
+//                        cal.get(Calendar.YEAR) + cal.get(Calendar.MONTH) + cal.get(Calendar.DATE) +
+//                    "/" + cal.get(Calendar.HOUR_OF_DAY)+"/"+ cal.get(Calendar.MINUTE)/10
+//            )
+//
+//            if(!mediaFileDir.isDirectory) continue
+//
+//            when(mediaFileDir.listFiles()) {
+//                null -> return
+//                else -> {
+//                    val mediaFileList = ArrayList<MediaFile>()
+//                    for (mediaFile in mediaFileDir.listFiles()!!) {
+//                        mediaFileList.add(MediaFile(mediaFile,Date( Files.readAttributes(mediaFile.toPath(),
+//                            BasicFileAttributes::class.java).creationTime().toMillis()),
+//                            getThumbnail(mediaFile)))
+//                        Log.d(TAG, "mediaFile : ${mediaFile.name}")
+//                    }
+//                }
 //            }
 //        }
+
+
+
+//        when(recordFileDir.listFiles())
+//        {
+//            null -> return
+//            else -> {
+//                for(dateDir in recordFileDir.listFiles()!!)// 날짜
+//                {
+//                    if(dateDir.isDirectory)
+//                    {
+//                        Log.d(TAG,"date absolutePath : ${dateDir.absolutePath}")
+//                        for(hourDir in dateDir.listFiles()!!)
+//                        {
+//                            Log.d(TAG,"hourDir : ${hourDir.absolutePath}")
 //
+//                            for(minDir in hourDir.listFiles()!!)
+//                            {
+//                                Log.d(TAG,"minDir : ${minDir.absolutePath}")
+//                            }
+//                        } } } }
+//        }
+
+
 //        when(dir.listFiles())
 //        {
 //            null -> return
 //            else -> {
 //
-//                val mediaFileList = ArrayList<MediaFile>();
+////                val mediaFileList = ArrayList<MediaFile>();
 ////                _listFiles.value = dir.listFiles()!!
 //
 //                for(file in dir.listFiles()!!)
 //                {
-//                    Log.d(TAG, " aaaaaf : " + file.path.toString() + " , " + file.path.endsWith(".mp4"))
-//                    mediaFileList.add(MediaFile(file,getThumbnail(file)))
+//                    val readAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes::class.java)
+//                    Log.d(TAG, " aaaaaf : " + file.path.toString() + " , " + file.path.endsWith(".mp4") +", createTime : ${Date(readAttributes.creationTime().toMillis())}")
+////                    mediaFileList.add(MediaFile(file,Date(readAttributes.creationTime().toMillis()),getThumbnail(file)))
+//
+//
+//
+//
+//
+//
 //                }
 //
-//                _listFiles.value = mediaFileList
+////                _listFiles.value = mediaFileList
 //            }
 //        }
-    }
+//    }
 
     fun setCurrentFile(file: File)
     {
@@ -90,23 +139,6 @@ class MediaViewModel : ViewModel() {
         _currentFile.value = file
     }
 
-
-    private fun getThumbnail(file: File) : Bitmap{
-
-        val size = Size(100,100)
-        val cancellationSignal = CancellationSignal()
-        var bitmap : Bitmap? = null
-        if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.Q)
-        {
-            bitmap = ThumbnailUtils.createVideoThumbnail(file, size, cancellationSignal);
-        } else{
-            bitmap = ThumbnailUtils.createVideoThumbnail(file.path, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
-        }
-
-        val thumbnail = ThumbnailUtils.extractThumbnail(bitmap, 360, 480);
-
-        return thumbnail
-    }
 
 
 }

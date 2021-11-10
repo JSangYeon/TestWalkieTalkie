@@ -35,58 +35,67 @@
             android:gravity="center_horizontal"
             android:text="@{hourMinute}"
             android:textSize="12sp"
+            android:visibility="@{timeCheck ? View.VISIBLE : View.GONE}"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/cl_circle"
-            app:layout_constraintBottom_toBottomOf="@id/cl_circle"/>
-
+            app:layout_constraintTop_toTopOf="@id/v_line"/>
 
         <View
-            android:id="@+id/v_top_line"
+            android:id="@+id/v_line"
             android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:background="@color/black"
+            android:layout_height="60dp"
+            android:background="@drawable/shape_round_square"
             app:layout_goneMarginStart="50dp"
-            android:visibility="@{startPoint ? View.GONE : View.VISIBLE}"
             app:layout_constraintStart_toEndOf="@+id/tv_time"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_circle"
-            android:layout_width="wrap_content"
-            android:layout_height="20dp"
-            app:layout_constraintStart_toStartOf="@id/v_top_line"
-            app:layout_constraintTop_toBottomOf="@id/v_top_line">
 
-            <View
-                android:id="@+id/v_circle"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@drawable/shape_circle"
-                android:visibility="@{timeCheck ? View.VISIBLE : View.GONE}"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+<!--        <View-->
+<!--            android:id="@+id/v_top_line"-->
+<!--            android:layout_width="20dp"-->
+<!--            android:layout_height="20dp"-->
+<!--            android:background="@color/black"-->
+<!--            app:layout_goneMarginStart="50dp"-->
+<!--            android:visibility="@{startPoint ? View.GONE : View.VISIBLE}"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/tv_time"-->
+<!--            app:layout_constraintTop_toTopOf="parent"/>-->
 
-            <View
-                android:id="@+id/view_middle_line"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:background="@color/black"
-                android:visibility="@{timeCheck ? View.GONE : View.VISIBLE}"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:id="@+id/cl_circle"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="20dp"-->
+<!--            app:layout_constraintStart_toStartOf="@id/v_top_line"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/v_top_line">-->
+
+<!--            <View-->
+<!--                android:id="@+id/v_circle"-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:background="@drawable/shape_circle"-->
+<!--                android:visibility="@{timeCheck ? View.VISIBLE : View.GONE}"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"/>-->
+
+<!--            <View-->
+<!--                android:id="@+id/view_middle_line"-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:background="@color/black"-->
+<!--                android:visibility="@{timeCheck ? View.GONE : View.VISIBLE}"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent"/>-->
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
 
 
-        <View
-            android:id="@+id/v_bottom_line"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:background="@color/black"
-            android:visibility="@{endPoint ? View.GONE : View.VISIBLE}"
-            app:layout_constraintStart_toStartOf="@+id/v_top_line"
-            app:layout_constraintTop_toBottomOf="@id/cl_circle" />
+<!--        <View-->
+<!--            android:id="@+id/v_bottom_line"-->
+<!--            android:layout_width="20dp"-->
+<!--            android:layout_height="20dp"-->
+<!--            android:background="@color/black"-->
+<!--            android:visibility="@{endPoint ? View.GONE : View.VISIBLE}"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/v_top_line"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/cl_circle" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

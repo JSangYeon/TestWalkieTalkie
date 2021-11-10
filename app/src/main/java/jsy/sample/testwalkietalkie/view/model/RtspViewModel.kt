@@ -26,8 +26,10 @@ class RtspViewModel : ViewModel() {
     var folder : File? = null
     set(value) {
         field = value
+        Log.d("field 체크", "${field!!.exists()}")
         if (!field!!.exists()) {
-            field!!.mkdir()
+            field!!.mkdirs()
+
         }
     }
 

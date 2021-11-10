@@ -15,9 +15,11 @@ abstract class BaseActivity<B : ViewDataBinding>(@LayoutRes private val layoutRe
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        TAG = javaClass.simpleName
         binding = DataBindingUtil.setContentView(this, layoutResId)
         binding.lifecycleOwner = this@BaseActivity
         binding.init()
+
 
     }
 

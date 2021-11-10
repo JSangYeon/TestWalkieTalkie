@@ -14,7 +14,7 @@
         android:layout_height="wrap_content">
 
         <include
-            android:id="@+id/top"
+            android:id="@+id/time_shape"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             layout="@layout/include_time_shape"
@@ -26,6 +26,18 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_media"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toEndOf="@id/time_shape"
+            app:layout_constraintTop_toTopOf="@id/time_shape"
+            app:layout_constraintBottom_toBottomOf="@id/time_shape"/>
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -47,6 +47,7 @@ abstract class BaseRecyclerView {
 
         override fun onBindViewHolder(holder: ViewHolder<B>, position: Int) {
             holder.onBindViewHolder(items[position])
+            holder.setIsRecyclable(false)
         }
     }
 

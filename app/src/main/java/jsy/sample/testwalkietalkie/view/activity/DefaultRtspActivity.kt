@@ -42,7 +42,7 @@ class DefaultRtspActivity : BaseActivity<ActivityDefaultRtspBinding>(R.layout.ac
             DefaultRtspSurfaceHolderCallback()
         )
 
-        _rtspViewModel.folder =  PathUtils.recordPath
+        _rtspViewModel.folder =  PathUtils.createFilePath
 
 
     }
