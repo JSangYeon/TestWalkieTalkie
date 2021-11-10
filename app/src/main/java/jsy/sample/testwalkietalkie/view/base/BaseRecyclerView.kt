@@ -16,7 +16,7 @@ abstract class BaseRecyclerView {
         private val bindingVariableId: Int? = null
     ) : RecyclerView.Adapter<ViewHolder<B>>() {
 
-        private val items = mutableListOf<ITEM>()
+        protected val items = mutableListOf<ITEM>()
 
         fun replaceAll(items: List<ITEM>?) {
             items?.let {
@@ -46,7 +46,6 @@ abstract class BaseRecyclerView {
         override fun getItemCount() = items.size
 
         override fun onBindViewHolder(holder: ViewHolder<B>, position: Int) {
-
             holder.onBindViewHolder(items[position])
         }
     }

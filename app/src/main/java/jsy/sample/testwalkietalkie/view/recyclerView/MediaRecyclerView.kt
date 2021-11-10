@@ -19,6 +19,10 @@ class MediaRecyclerView() : BaseRecyclerView() {
                 parent = parent,
                 mediaViewModel = mediaViewModel
             ) {}
+
+//        override fun onBindViewHolder(holder: ViewHolder<ItemMediaFileBinding>, position: Int) {
+//            super.onBindViewHolder(holder, position )
+//        }
     }
 
     open class MediaViewHolder(parent: ViewGroup, private val mediaViewModel: MediaViewModel) : BaseRecyclerView.ViewHolder<ItemMediaFileBinding>(

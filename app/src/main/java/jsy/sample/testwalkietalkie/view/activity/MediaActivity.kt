@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import jsy.sample.testwalkietalkie.view.base.BaseRecyclerView
 import jsy.sample.testwalkietalkie.view.recyclerView.MediaRecyclerView
+import jsy.sample.testwalkietalkie.view.recyclerView.MediaTimeLineRecyclerView
 import java.io.File
 import java.lang.Exception
 
@@ -33,7 +34,7 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>(R.layout.activity_media
         _mediaViewModel.getFolderFileList()
 
 
-        rvListMedia.layoutManager = GridLayoutManager(this@MediaActivity, 2)
+//        rvListMedia.layoutManager = GridLayoutManager(this@MediaActivity, 2)
 
 
         initObserve()
@@ -44,29 +45,38 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>(R.layout.activity_media
     private fun initObserve(){
 
 
-        val adapter = MediaRecyclerView.MediaAdapter(_mediaViewModel)
-        _mediaViewModel.listFiles.observe(binding.lifecycleOwner!!, { listFiles->
-            if(listFiles == null) return@observe
-            adapter.replaceAll(_mediaViewModel.listFiles.value!!)
+        val adapter = MediaTimeLineRecyclerView.MediaTimeLineAdapter(_mediaViewModel)
+        _mediaViewModel.listMediaTimeLine.observe(binding.lifecycleOwner!!, { listMediaTimeLine ->
+            if(listMediaTimeLine.isEmpty()) return@observe
+            adapter.replaceAll(_mediaViewModel.listMediaTimeLine.value)
             binding.rvListMedia.adapter = adapter
         })
 
-        _mediaViewModel.currentFile.observe(binding.lifecycleOwner!!, {file->
-            if(file == null ) return@observe
-//            if(mediaPlayer.isPlaying){
+
+//        val adapter = MediaRecyclerView.MediaAdapter(_mediaViewModel)
+//
+//        _mediaViewModel.listFiles.observe(binding.lifecycleOwner!!, { listFiles->
+//            if(listFiles == null) return@observe
+//            adapter.replaceAll(_mediaViewModel.listFiles.value!!)
+//            binding.rvListMedia.adapter = adapter
+//        })
+//
+//        _mediaViewModel.currentFile.observe(binding.lifecycleOwner!!, {file->
+//            if(file == null ) return@observe
+////            if(mediaPlayer.isPlaying){
+////            }
+//
+//            mediaPlayer.reset()
+//            try {
+//                mediaPlayer.setDataSource(file.path)
+//                mediaPlayer.setDisplay(binding.svMedia.holder)
+//                mediaPlayer.prepare()
+//                mediaPlayer.start()
+//            } catch (e: Exception) {
+//
 //            }
-
-            mediaPlayer.reset()
-            try {
-                mediaPlayer.setDataSource(file.path)
-                mediaPlayer.setDisplay(binding.svMedia.holder)
-                mediaPlayer.prepare()
-                mediaPlayer.start()
-            } catch (e: Exception) {
-
-            }
-
-        })
+//
+//        })
 
 
     }
