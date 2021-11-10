@@ -66,7 +66,6 @@ fun getMediaTimeLineList() : ArrayList<MediaTimeLine> {
 
     var currentDateRestMinute = ((cal.time.time/60000)%10).toInt() // 앞의 짜투리시간 제거 05분~ 07분 등
 
-
     addMediaTimeLine(mediaTimeLineList, cal, startPoint = true, endPoint = false) // 현재시간
 
     if(minuteGap > currentDateRestMinute)

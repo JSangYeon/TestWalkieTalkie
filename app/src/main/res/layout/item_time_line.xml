@@ -29,12 +29,13 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_media"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:orientation="horizontal"
             app:layout_constraintStart_toEndOf="@id/time_shape"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/time_shape"
             app:layout_constraintBottom_toBottomOf="@id/time_shape"/>
 

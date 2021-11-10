@@ -10,4 +10,3 @@ data class MediaTimeLine (
     val timeCheck: Boolean, // 시간표시 필요한지 체크
     val mediaFileList : ArrayList<MediaFile>? // 파일 리스트
 )
-
