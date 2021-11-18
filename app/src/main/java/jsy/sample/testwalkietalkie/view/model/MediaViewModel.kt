@@ -1,5 +1,7 @@
 package jsy.sample.testwalkietalkie.view.model
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils
 import android.os.Build
@@ -7,17 +9,22 @@ import android.os.CancellationSignal
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import jsy.sample.testwalkietalkie.R
+import jsy.sample.testwalkietalkie.application.MyApplication
 import jsy.sample.testwalkietalkie.data.MediaFile
 import jsy.sample.testwalkietalkie.data.MediaTimeLine
 import jsy.sample.testwalkietalkie.utils.PathUtils
-import jsy.sample.testwalkietalkie.utils.getMediaTimeLineList
-import jsy.sample.testwalkietalkie.utils.getDateStartTime
+import jsy.sample.testwalkietalkie.utils.getTimeSharedPreferences
+import jsy.sample.testwalkietalkie.utils.timeSimpleDateFormat
+import jsy.sample.testwalkietalkie.view.recyclerView.MediaRecyclerView
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -25,9 +32,6 @@ class MediaViewModel : ViewModel() {
 
     private val TAG = "MediaViewModel"
 
-    private val _listFiles = MutableLiveData<ArrayList<MediaFile>?>()
-    val listFiles : LiveData<ArrayList<MediaFile>?>
-        get() = _listFiles
 
     private val _listMediaTimeLine = MutableLiveData<ArrayList<MediaTimeLine>>()
     val listMediaTimeLine : LiveData<ArrayList<MediaTimeLine>>
@@ -37,101 +41,32 @@ class MediaViewModel : ViewModel() {
     val currentFile : LiveData<File?>
         get() = _currentFile
 
+    private val _listOneMinutePixel = MutableLiveData<ArrayList<Int>>()
+    val listOneMinutePixel : LiveData<ArrayList<Int>>
+            get() = _listOneMinutePixel
+
+    private val _currentScrolledTime = MutableLiveData<String>()
+    val currentScrolledTime : LiveData<String>
+        get() = _currentScrolledTime
+
+    private val _mediaTimeVisible = MutableLiveData<Boolean>()
+    val mediaTimeVisible : LiveData<Boolean>
+        get() = _mediaTimeVisible
+
+    companion object{
+        var firstMediaViewHeightCheck = true
+        var viewHeight = 0
+    }
+
+
     init {
-        _listFiles.value = null
         _currentFile.value = null
     }
 
     fun getFolderFileList() {
         Log.d("getDateStartTime", "date : ${getDateStartTime()}")
-
         _listMediaTimeLine.value = getMediaTimeLineList()
     }
-
-//    private fun getFileList(){
-//        val recordFileDir = PathUtils.recordPath
-//        Log.d(TAG, "Path : ${PathUtils.recordPath.name}")
-//        if (!recordFileDir.isDirectory) return
-//
-//        val mediaTimeLineList = getMediaTimeLineList()
-//
-//        for(mediaTimeLine in mediaTimeLineList) {
-//            val date = mediaTimeLine.date
-//            val cal = Calendar.getInstance()
-//            cal.time = date
-//
-//            if(cal.get(Calendar.MINUTE)%10==0) cal.add(Calendar.MINUTE,-10)
-//
-//            val mediaFileDir = File(
-//                PathUtils.recordPath.absolutePath +"/" +
-//                        cal.get(Calendar.YEAR) + cal.get(Calendar.MONTH) + cal.get(Calendar.DATE) +
-//                    "/" + cal.get(Calendar.HOUR_OF_DAY)+"/"+ cal.get(Calendar.MINUTE)/10
-//            )
-//
-//            if(!mediaFileDir.isDirectory) continue
-//
-//            when(mediaFileDir.listFiles()) {
-//                null -> return
-//                else -> {
-//                    val mediaFileList = ArrayList<MediaFile>()
-//                    for (mediaFile in mediaFileDir.listFiles()!!) {
-//                        mediaFileList.add(MediaFile(mediaFile,Date( Files.readAttributes(mediaFile.toPath(),
-//                            BasicFileAttributes::class.java).creationTime().toMillis()),
-//                            getThumbnail(mediaFile)))
-//                        Log.d(TAG, "mediaFile : ${mediaFile.name}")
-//                    }
-//                }
-//            }
-//        }
-
-
-
-//        when(recordFileDir.listFiles())
-//        {
-//            null -> return
-//            else -> {
-//                for(dateDir in recordFileDir.listFiles()!!)// 날짜
-//                {
-//                    if(dateDir.isDirectory)
-//                    {
-//                        Log.d(TAG,"date absolutePath : ${dateDir.absolutePath}")
-//                        for(hourDir in dateDir.listFiles()!!)
-//                        {
-//                            Log.d(TAG,"hourDir : ${hourDir.absolutePath}")
-//
-//                            for(minDir in hourDir.listFiles()!!)
-//                            {
-//                                Log.d(TAG,"minDir : ${minDir.absolutePath}")
-//                            }
-//                        } } } }
-//        }
-
-
-//        when(dir.listFiles())
-//        {
-//            null -> return
-//            else -> {
-//
-////                val mediaFileList = ArrayList<MediaFile>();
-////                _listFiles.value = dir.listFiles()!!
-//
-//                for(file in dir.listFiles()!!)
-//                {
-//                    val readAttributes = Files.readAttributes(file.toPath(), BasicFileAttributes::class.java)
-//                    Log.d(TAG, " aaaaaf : " + file.path.toString() + " , " + file.path.endsWith(".mp4") +", createTime : ${Date(readAttributes.creationTime().toMillis())}")
-////                    mediaFileList.add(MediaFile(file,Date(readAttributes.creationTime().toMillis()),getThumbnail(file)))
-//
-//
-//
-//
-//
-//
-//                }
-//
-////                _listFiles.value = mediaFileList
-//            }
-//        }
-//    }
 
     fun setCurrentFile(file: File)
     {
@@ -140,5 +75,189 @@ class MediaViewModel : ViewModel() {
     }
 
 
+    fun setOneMinutePixelList(){
+        val oneMinutePixelList = ArrayList<Int>()
+        val cal = Calendar.getInstance()
+        for(mediaTimeLine in _listMediaTimeLine.value!!) {
+            cal.time = mediaTimeLine.date
+            val restTime = cal.get(Calendar.MINUTE)%10
+
+            if(restTime==0) // 10분단위
+                oneMinutePixelList.add(viewHeight/10)
+            else
+                oneMinutePixelList.add(viewHeight/restTime)
+        }
+
+        _listOneMinutePixel.value = oneMinutePixelList
+    }
+
+
+    fun getScrollTime(scrollPosition : Int, scrollHeight : Int){ //스크롤된 위치의 시간 구하기
+
+        val position = scrollHeight / viewHeight
+        val height = scrollHeight % viewHeight
+        Log.d("position","${position}, scrollHeight ${scrollHeight}")
+
+        val minute = when(height%listOneMinutePixel.value!![position]) {
+            0-> height/listOneMinutePixel.value!![position]
+            else-> height/listOneMinutePixel.value!![position]
+        }
+
+        Log.d("getScrollTime", "height : $height, _listOneMinutePixel : ${_listOneMinutePixel.value!![position]}, minute : ${minute}")
+
+
+        val cal = Calendar.getInstance()
+        cal.time = listMediaTimeLine.value!![position].date
+        cal.add(Calendar.MINUTE, -minute)
+
+
+
+
+        _currentScrolledTime.value = hourMinuteSimpleDateFormat().format(cal.time)
+
+        Log.d("getScrollTime", "time : ${_currentScrolledTime.value}")
+
+    }
+
+
+
+
+
+
+
+
+    fun getDateStartTime() : Date{
+        val startTime = getTimeSharedPreferences().getString(MyApplication.instance.getString(R.string.start_time), null)
+        Log.d("getDateStartTime", "startTime : $startTime")
+
+        return timeSimpleDateFormat().parse(startTime!!)!!
+    }
+
+
+    fun getMediaTimeLineList() : java.util.ArrayList<MediaTimeLine> {
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.SECOND, 0)
+        val mediaTimeLineList = java.util.ArrayList<MediaTimeLine>()
+
+        if(cal.time.time == getDateStartTime().time) // 앱 처음킨 시간에 들어왔을 때
+        {
+            addMediaTimeLine(mediaTimeLineList, cal, startPoint = true, endPoint = true) // 현재시간
+            return mediaTimeLineList
+        }
+
+        var minuteGap = ((cal.time.time - getDateStartTime().time)/60000).toInt() // 시작시간, 현재시간의 분 차이
+
+        var currentDateRestMinute = ((cal.time.time/60000)%10).toInt() // 앞의 짜투리시간 제거 05분~ 07분 등
+
+        addMediaTimeLine(mediaTimeLineList, cal, startPoint = true, endPoint = false) // 현재시간
+
+        if(minuteGap > currentDateRestMinute)
+        {
+            if(currentDateRestMinute > 0) //가까운 10분대 단위 맞추기
+            {
+                cal.add(Calendar.MINUTE, -currentDateRestMinute)
+                minuteGap -= currentDateRestMinute
+                currentDateRestMinute -= currentDateRestMinute
+                addMediaTimeLine(mediaTimeLineList, cal, startPoint = false, endPoint = false)
+            }
+
+            while(minuteGap>10){// 10분씩 체크
+                minuteGap -= 10
+                cal.add(Calendar.MINUTE, -10)
+                addMediaTimeLine(mediaTimeLineList, cal, startPoint = false, endPoint = false)
+            }
+        }
+
+//    if(minuteGap>0) // 시작시간
+//    {
+//        cal.add(Calendar.MINUTE,-minuteGap)
+//        addMediaTimeLine(mediaTimeLineList, cal, startPoint = false, endPoint = true) // 시작시간
+//    }
+
+        return mediaTimeLineList
+    }
+
+
+
+    private fun addMediaTimeLine(mediaTimeLineList : java.util.ArrayList<MediaTimeLine>, cal:Calendar, startPoint:Boolean, endPoint:Boolean ){
+
+        var timeCheck = false;
+
+        val date = cal.time
+
+        if(startPoint||endPoint||cal.get(Calendar.MINUTE)%30 == 0) timeCheck = true
+
+        mediaTimeLineList.add(MediaTimeLine(date, hourMinuteSimpleDateFormat().format(cal.time), startPoint, endPoint, timeCheck, getMediaAdapter(date)))
+
+    }
+
+
+
+    private fun hourMinuteSimpleDateFormat(): SimpleDateFormat = SimpleDateFormat("HH:mm",Locale.getDefault())
+
+
+
+    private fun getMediaAdapter(date:Date) : MediaRecyclerView.MediaAdapter?{
+        val recordFileDir = PathUtils.recordPath
+        if (!recordFileDir.isDirectory) return null
+
+
+        val cal = Calendar.getInstance()
+        cal.time = date
+
+        if(cal.get(Calendar.MINUTE)%10==0) cal.add(Calendar.MINUTE,-10)
+
+        val mediaFileDir = File(
+            PathUtils.recordPath.absolutePath +"/" +
+                    cal.get(Calendar.YEAR) + cal.get(Calendar.MONTH) + cal.get(Calendar.DATE) +
+                    "/" + cal.get(Calendar.HOUR_OF_DAY)+"/"+ cal.get(Calendar.MINUTE)/10
+        )
+
+        if(!mediaFileDir.isDirectory) return null
+
+
+        Log.d("MediaFileLoop", "mediaFileDir : ${mediaFileDir.absolutePath}")
+        return when(mediaFileDir.listFiles()) {
+            null -> null
+            else -> {
+
+                val mediaFileList = java.util.ArrayList<MediaFile>()
+                for (mediaFile in mediaFileDir.listFiles()!!) {
+                    Log.d("MediaFileLoop", "mediaFile : ${mediaFile.name}")
+                    mediaFileList.add(
+                        MediaFile(mediaFile,Date( Files.readAttributes(mediaFile.toPath(),
+                            BasicFileAttributes::class.java).creationTime().toMillis()),
+                            getThumbnail(mediaFile))
+                    )
+                }
+
+                val adapter = MediaRecyclerView.MediaAdapter(this@MediaViewModel)
+                adapter.replaceAll(mediaFileList)
+                return adapter
+
+
+            }
+        }
+    }
+
+
+
+
+    private fun getThumbnail(file: File) : Bitmap {
+
+        val size = Size(100,100)
+        val cancellationSignal = CancellationSignal()
+
+        val bitmap = if(Build.VERSION.SDK_INT>= Build.VERSION_CODES.Q)
+        {
+            ThumbnailUtils.createVideoThumbnail(file, size, cancellationSignal);
+        } else{
+            ThumbnailUtils.createVideoThumbnail(file.path, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+        }
+
+        val thumbnail = ThumbnailUtils.extractThumbnail(bitmap, 120, 160);
+
+        return thumbnail
+    }
 
 }

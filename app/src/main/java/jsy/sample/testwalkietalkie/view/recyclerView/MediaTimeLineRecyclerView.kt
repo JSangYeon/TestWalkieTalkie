@@ -1,66 +1,69 @@
 package jsy.sample.testwalkietalkie.view.recyclerView
 
+import android.content.Context
 import android.util.Log
-import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.view.ViewTreeObserver
+import androidx.appcompat.view.menu.MenuView
+import androidx.core.view.get
+import androidx.databinding.DataBindingUtil
 import androidx.databinding.library.baseAdapters.BR
 import jsy.sample.testwalkietalkie.R
-import jsy.sample.testwalkietalkie.application.MyApplication
-import jsy.sample.testwalkietalkie.data.MediaFile
 import jsy.sample.testwalkietalkie.data.MediaTimeLine
-import jsy.sample.testwalkietalkie.databinding.ItemMediaFileBinding
 import jsy.sample.testwalkietalkie.databinding.ItemTimeLineBinding
+import jsy.sample.testwalkietalkie.utils.dpToPx
+import jsy.sample.testwalkietalkie.utils.pxToDp
 import jsy.sample.testwalkietalkie.view.base.BaseRecyclerView
 import jsy.sample.testwalkietalkie.view.model.MediaViewModel
+import jsy.sample.testwalkietalkie.view.model.MediaViewModel.Companion.firstMediaViewHeightCheck
+import jsy.sample.testwalkietalkie.view.model.MediaViewModel.Companion.viewHeight
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MediaTimeLineRecyclerView() : BaseRecyclerView() {
+
     class MediaTimeLineAdapter(private val mediaViewModel: MediaViewModel) : BaseRecyclerView.Adapter<MediaTimeLine, ItemTimeLineBinding>(
         R.layout.item_time_line,
         BR.mediaTimeLine){
 
-
-//        override fun onCreateViewHolder(
-//            parent: ViewGroup,
-//            viewType: Int
-//        ): ViewHolder<ItemTimeLineBinding> {
-//
-//
-//
-//            return super.onCreateViewHolder(parent, viewType)
-//        }
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-            object : MediaTimeLineViewHolder(
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaTimeLineViewHolder {
+            return MediaTimeLineViewHolder(
                 parent = parent,
-                mediaViewModel = mediaViewModel
-            ) {
+                mediaViewModel = mediaViewModel)
+        }
 
-            }
-
-//        override fun onBindViewHolder(holder: ViewHolder<ItemMediaFileBinding>, position: Int) {
-//            onBindViewHolder(holder, position)
-//
-//        }
     }
 
-    open class MediaTimeLineViewHolder(parent: ViewGroup, private val mediaViewModel: MediaViewModel) : BaseRecyclerView.ViewHolder<ItemTimeLineBinding>(
+    class MediaTimeLineViewHolder(parent: ViewGroup, private val mediaViewModel: MediaViewModel) : BaseRecyclerView.ViewHolder<ItemTimeLineBinding>(
         layoutResId = R.layout.item_time_line,
         parent = parent,
         bindingVariableId = BR.mediaTimeLine
     ) {
+
         override fun onBindViewHolder(item: Any?) {
             super.onBindViewHolder(item)
-            Log.d("currentDate", "date : ${binding.mediaTimeLine!!.date}")
+            Log.d("미디어뷰 번호" , "${adapterPosition}")
 
-            if(binding.mediaTimeLine!!.mediaFileList!=null) {
-                val adapter = MediaRecyclerView.MediaAdapter(mediaViewModel)
-                adapter.replaceAll(binding.mediaTimeLine!!.mediaFileList)
-                binding.rvMedia.adapter = adapter
+            if(firstMediaViewHeightCheck)
+            {
+                firstMediaViewHeightCheck = false
+
+                itemView.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener{
+                    override fun onGlobalLayout() {
+                        itemView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        viewHeight = itemView.height
+                        Log.d("미디어뷰 높이" , "height : ${itemView.height}, measureHeight : ${itemView.measuredHeight}\n" +
+                                "heightDp : ${itemView.height.pxToDp}, measureHeightDp : ${itemView.measuredHeight.pxToDp}\n" +
+                                "dpTopx : ${itemView.height.pxToDp.toInt().dpToPx}")
+
+                        mediaViewModel.setOneMinutePixelList() // view height pixel 설정
+                    }
+                })
             }
 
+
         }
-
-
     }
+
 }

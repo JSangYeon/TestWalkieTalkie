@@ -2,9 +2,16 @@ package jsy.sample.testwalkietalkie.view.activity
 
 import android.media.MediaPlayer
 import android.util.Log
+import android.view.ViewTreeObserver
 import androidx.activity.viewModels
+import androidx.core.view.get
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import jsy.sample.testwalkietalkie.R
 import jsy.sample.testwalkietalkie.databinding.ActivityMediaBinding
+import jsy.sample.testwalkietalkie.utils.dpToPx
+import jsy.sample.testwalkietalkie.utils.pxToDp
 import jsy.sample.testwalkietalkie.view.base.BaseActivity
 import jsy.sample.testwalkietalkie.view.model.MediaViewModel
 import java.util.*
@@ -22,11 +29,15 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>(R.layout.activity_media
     override fun ActivityMediaBinding.init() {
 //        val mediaPlayer = MediaPlayer.create(this)
         mediaViewModel = _mediaViewModel
-
         _mediaViewModel.getFolderFileList()
-
-
 //        rvListMedia.layoutManager = GridLayoutManager(this@MediaActivity, 2)
+
+
+
+
+
+//        binding.rvTimeLine.addOnScrollListener(RecyclerView.OnScrollListener{})
+
 
 
         initObserve()
@@ -37,45 +48,72 @@ class MediaActivity : BaseActivity<ActivityMediaBinding>(R.layout.activity_media
     private fun initObserve(){
 
         val adapter = MediaTimeLineRecyclerView.MediaTimeLineAdapter(_mediaViewModel)
-        _mediaViewModel.listMediaTimeLine.observe(binding.lifecycleOwner!!, { listMediaTimeLine ->
-            if(listMediaTimeLine.isEmpty()) return@observe
-            adapter.replaceAll(_mediaViewModel.listMediaTimeLine.value)
 
-            for(list in _mediaViewModel.listMediaTimeLine.value!!)
-            {
-                val date = list.date
+        with(binding)
+        {
+            rvTimeLine.adapter = adapter
+            _mediaViewModel.listMediaTimeLine.observe(lifecycleOwner!!, { listMediaTimeLine ->
+                if(listMediaTimeLine.isEmpty()) return@observe
+                adapter.replaceAll(_mediaViewModel.listMediaTimeLine.value)
 
-                Log.d(TAG,"리사이클러뷰 넘길때의 date : ${date}" )
-            }
+                for(list in _mediaViewModel.listMediaTimeLine.value!!)
+                {
+                    val date = list.date
 
-            binding.rvTimeLine.adapter = adapter
-        })
+                    Log.d(TAG,"리사이클러뷰 넘길때의 date : ${date}")
+                }
+
+            })
+
+            _mediaViewModel.currentFile.observe(lifecycleOwner!!, {file->
+                if(file == null ) return@observe
+
+                mediaPlayer.reset()
+                try {
+                    mediaPlayer.setDataSource(file.path)
+                    mediaPlayer.setDisplay(svMedia.holder)
+                    mediaPlayer.prepare()
+                    mediaPlayer.start()
+                } catch (e: Exception) {
+
+                }
+
+            })
 
 
-//        val adapter = MediaRecyclerView.MediaAdapter(_mediaViewModel)
-//
-//        _mediaViewModel.listFiles.observe(binding.lifecycleOwner!!, { listFiles->
-//            if(listFiles == null) return@observe
-//            adapter.replaceAll(_mediaViewModel.listFiles.value!!)
-//            binding.rvListMedia.adapter = adapter
-//        })
-//
-        _mediaViewModel.currentFile.observe(binding.lifecycleOwner!!, {file->
-            if(file == null ) return@observe
-//            if(mediaPlayer.isPlaying){
-//            }
+            _mediaViewModel.listOneMinutePixel.observe(lifecycleOwner!!, {
+                Log.d("listOneMinutePixel", "changeCheckObserve")
+                var lastScrollPosition = 0;
 
-            mediaPlayer.reset()
-            try {
-                mediaPlayer.setDataSource(file.path)
-                mediaPlayer.setDisplay(binding.svMedia.holder)
-                mediaPlayer.prepare()
-                mediaPlayer.start()
-            } catch (e: Exception) {
+                with(rvTimeLine){
+                    clearOnScrollListeners()
+                    var currentHeight = 0;
+                    addOnScrollListener(object : RecyclerView.OnScrollListener(){ //1칸의 height 을 구해서 포지션만큼 빼준값을 이용해 시간을 구해야함
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+                            lastScrollPosition = (layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
 
-            }
 
-        })
+                            currentHeight += dy
+
+                            Log.d("scrollChangeCheck", "lastScrollPosition : ${lastScrollPosition}\n" +
+                                    "dy : ${dy.pxToDp} , currentHeight : ${currentHeight.pxToDp}\n" +
+                                    "")
+
+                            _mediaViewModel.getScrollTime(lastScrollPosition, currentHeight)
+
+                        }
+                    })
+                }
+
+            })
+
+            _mediaViewModel.currentScrolledTime.observe(lifecycleOwner!!, { currentScrolledTime ->
+                tvScrolledTime.text = currentScrolledTime
+            })
+
+        }
+
 
 
     }
