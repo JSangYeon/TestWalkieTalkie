@@ -7,5 +7,5 @@ import java.util.*
 data class MediaFile(
     val file: File,
     val createDate : Date,
-    val thumbnail : Bitmap
+    val thumbnail : Bitmap?
 )

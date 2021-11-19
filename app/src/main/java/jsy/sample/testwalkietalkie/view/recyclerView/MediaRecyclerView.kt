@@ -30,7 +30,10 @@ class MediaRecyclerView() : BaseRecyclerView() {
             super.onBindViewHolder(item)
             val mediaFile = item as MediaFile
 
-            binding.ivFileThumbnail.setImageBitmap(mediaFile.thumbnail)
+            if(mediaFile.thumbnail!=null)
+            {
+                binding.ivFileThumbnail.setImageBitmap(mediaFile.thumbnail)
+            }
 
             itemView.setOnClickListener { mediaViewModel.setCurrentFile(mediaFile.file) }
 

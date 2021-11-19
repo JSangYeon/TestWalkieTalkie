@@ -1,14 +1,11 @@
 package jsy.sample.testwalkietalkie.view.recyclerView
 
-import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import androidx.appcompat.view.menu.MenuView
-import androidx.core.view.get
-import androidx.databinding.DataBindingUtil
 import androidx.databinding.library.baseAdapters.BR
+import androidx.lifecycle.LifecycleOwner
 import jsy.sample.testwalkietalkie.R
 import jsy.sample.testwalkietalkie.data.MediaTimeLine
 import jsy.sample.testwalkietalkie.databinding.ItemTimeLineBinding
@@ -17,9 +14,8 @@ import jsy.sample.testwalkietalkie.utils.pxToDp
 import jsy.sample.testwalkietalkie.view.base.BaseRecyclerView
 import jsy.sample.testwalkietalkie.view.model.MediaViewModel
 import jsy.sample.testwalkietalkie.view.model.MediaViewModel.Companion.firstMediaViewHeightCheck
+import jsy.sample.testwalkietalkie.view.model.MediaViewModel.Companion.tvTimeHeight
 import jsy.sample.testwalkietalkie.view.model.MediaViewModel.Companion.viewHeight
-import java.util.*
-import kotlin.collections.ArrayList
 
 class MediaTimeLineRecyclerView() : BaseRecyclerView() {
 
@@ -30,7 +26,8 @@ class MediaTimeLineRecyclerView() : BaseRecyclerView() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MediaTimeLineViewHolder {
             return MediaTimeLineViewHolder(
                 parent = parent,
-                mediaViewModel = mediaViewModel)
+                mediaViewModel = mediaViewModel
+            )
         }
 
     }
@@ -43,7 +40,6 @@ class MediaTimeLineRecyclerView() : BaseRecyclerView() {
 
         override fun onBindViewHolder(item: Any?) {
             super.onBindViewHolder(item)
-            Log.d("미디어뷰 번호" , "${adapterPosition}")
 
             if(firstMediaViewHeightCheck)
             {
@@ -53,14 +49,41 @@ class MediaTimeLineRecyclerView() : BaseRecyclerView() {
                     override fun onGlobalLayout() {
                         itemView.viewTreeObserver.removeOnGlobalLayoutListener(this)
                         viewHeight = itemView.height
-                        Log.d("미디어뷰 높이" , "height : ${itemView.height}, measureHeight : ${itemView.measuredHeight}\n" +
-                                "heightDp : ${itemView.height.pxToDp}, measureHeightDp : ${itemView.measuredHeight.pxToDp}\n" +
-                                "dpTopx : ${itemView.height.pxToDp.toInt().dpToPx}")
 
                         mediaViewModel.setOneMinutePixelList() // view height pixel 설정
+
+
+                    }
+                })
+
+                binding.timeShape.tvTime.viewTreeObserver.addOnGlobalLayoutListener (object : ViewTreeObserver.OnGlobalLayoutListener{
+                    override fun onGlobalLayout() {
+                        binding.timeShape.tvTime.viewTreeObserver.removeOnGlobalLayoutListener(this)
+                        tvTimeHeight = binding.timeShape.tvTime.height
                     }
                 })
             }
+
+
+            if((item as MediaTimeLine).timeCheck)
+            {
+                Log.d("아이템체크", "${item}")
+                mediaViewModel.currentInvisibleIndex.observe(itemView.context as LifecycleOwner, { invisibleIndex->
+                    if(adapterPosition == invisibleIndex)
+                    {
+                        binding.timeShape.tvTime.visibility = View.INVISIBLE
+                    }
+                })
+
+                mediaViewModel.visibleIndex.observe(itemView.context as LifecycleOwner, { visibleIndex ->
+                    if(adapterPosition == visibleIndex)
+                    {
+                        binding.timeShape.tvTime.visibility = View.VISIBLE
+                    }
+                })
+            }
+
+
 
 
         }

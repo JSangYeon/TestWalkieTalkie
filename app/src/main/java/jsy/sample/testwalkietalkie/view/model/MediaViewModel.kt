@@ -1,7 +1,5 @@
 package jsy.sample.testwalkietalkie.view.model
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils
 import android.os.Build
@@ -9,7 +7,6 @@ import android.os.CancellationSignal
 import android.provider.MediaStore
 import android.util.Log
 import android.util.Size
-import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,12 +29,11 @@ class MediaViewModel : ViewModel() {
 
     private val TAG = "MediaViewModel"
 
-
     private val _listMediaTimeLine = MutableLiveData<ArrayList<MediaTimeLine>>()
     val listMediaTimeLine : LiveData<ArrayList<MediaTimeLine>>
         get() = _listMediaTimeLine
 
-    private val _currentFile = MutableLiveData<File?>()
+    private val _currentFile = MutableLiveData<File?>(null)
     val currentFile : LiveData<File?>
         get() = _currentFile
 
@@ -49,19 +45,24 @@ class MediaViewModel : ViewModel() {
     val currentScrolledTime : LiveData<String>
         get() = _currentScrolledTime
 
-    private val _mediaTimeVisible = MutableLiveData<Boolean>()
-    val mediaTimeVisible : LiveData<Boolean>
-        get() = _mediaTimeVisible
+    private val _currentInvisibleIndex = MutableLiveData<Int>(-1)
+    val currentInvisibleIndex : LiveData<Int>
+        get() = _currentInvisibleIndex
+
+    private val _visibleIndex = MutableLiveData<Int>(-1)
+    val visibleIndex : LiveData<Int>
+        get() = _visibleIndex
+
+
 
     companion object{
         var firstMediaViewHeightCheck = true
         var viewHeight = 0
+        var tvTimeHeight = 0
     }
 
 
-    init {
-        _currentFile.value = null
-    }
+
 
     fun getFolderFileList() {
         Log.d("getDateStartTime", "date : ${getDateStartTime()}")
@@ -96,27 +97,44 @@ class MediaViewModel : ViewModel() {
 
         val position = scrollHeight / viewHeight
         val height = scrollHeight % viewHeight
-        Log.d("position","${position}, scrollHeight ${scrollHeight}")
+        Log.d("position","${position}, scrollPosition ${scrollPosition}, scrollHeight ${scrollHeight}")
 
-        val minute = when(height%listOneMinutePixel.value!![position]) {
-            0-> height/listOneMinutePixel.value!![position]
-            else-> height/listOneMinutePixel.value!![position]
-        }
+        val minute = height/listOneMinutePixel.value!![scrollPosition]
 
-        Log.d("getScrollTime", "height : $height, _listOneMinutePixel : ${_listOneMinutePixel.value!![position]}, minute : ${minute}")
 
+        getCheck(scrollPosition, height)
 
         val cal = Calendar.getInstance()
-        cal.time = listMediaTimeLine.value!![position].date
+        cal.time = listMediaTimeLine.value!![scrollPosition].date
+
+
+//        val positionMinute = cal.get(Calendar.MINUTE)
+//
         cal.add(Calendar.MINUTE, -minute)
+//        val scrolledMinute = cal.get(Calendar.MINUTE)
 
-
-
-
+//        Log.d("minute비교", "position : ${positionMinute}, scrolled : ${scrolledMinute}")
         _currentScrolledTime.value = hourMinuteSimpleDateFormat().format(cal.time)
 
-        Log.d("getScrollTime", "time : ${_currentScrolledTime.value}")
 
+
+
+//        Log.d("getScrollTime", "time : ${_currentScrolledTime.value}, scrollPosition : ${scrollPosition}")
+
+    }
+
+
+    private fun getCheck(scrollPosition : Int, height : Int)
+    {
+        if(height< tvTimeHeight) {
+            if(_currentInvisibleIndex.value != scrollPosition) _currentInvisibleIndex.value = scrollPosition
+        } else if ((height > viewHeight-tvTimeHeight)){
+            if(_currentInvisibleIndex.value != scrollPosition+1 && scrollPosition+1 <  listMediaTimeLine.value!!.size )
+            _currentInvisibleIndex.value = scrollPosition+1
+        }else if(_visibleIndex.value != _currentInvisibleIndex.value){
+            _visibleIndex.value = _currentInvisibleIndex.value
+            _currentInvisibleIndex.value = -1
+        }
     }
 
 
@@ -126,7 +144,7 @@ class MediaViewModel : ViewModel() {
 
 
 
-    fun getDateStartTime() : Date{
+    private fun getDateStartTime() : Date{
         val startTime = getTimeSharedPreferences().getString(MyApplication.instance.getString(R.string.start_time), null)
         Log.d("getDateStartTime", "startTime : $startTime")
 
@@ -134,7 +152,7 @@ class MediaViewModel : ViewModel() {
     }
 
 
-    fun getMediaTimeLineList() : java.util.ArrayList<MediaTimeLine> {
+    private fun getMediaTimeLineList() : java.util.ArrayList<MediaTimeLine> {
         val cal = Calendar.getInstance()
         cal.set(Calendar.SECOND, 0)
         val mediaTimeLineList = java.util.ArrayList<MediaTimeLine>()
@@ -185,7 +203,7 @@ class MediaViewModel : ViewModel() {
 
         val date = cal.time
 
-        if(startPoint||endPoint||cal.get(Calendar.MINUTE)%30 == 0) timeCheck = true
+        if(!startPoint && cal.get(Calendar.MINUTE)%30 == 0) timeCheck = true
 
         mediaTimeLineList.add(MediaTimeLine(date, hourMinuteSimpleDateFormat().format(cal.time), startPoint, endPoint, timeCheck, getMediaAdapter(date)))
 
@@ -243,7 +261,7 @@ class MediaViewModel : ViewModel() {
 
 
 
-    private fun getThumbnail(file: File) : Bitmap {
+    private fun getThumbnail(file: File) : Bitmap? {
 
         val size = Size(100,100)
         val cancellationSignal = CancellationSignal()
@@ -252,7 +270,7 @@ class MediaViewModel : ViewModel() {
         {
             ThumbnailUtils.createVideoThumbnail(file, size, cancellationSignal);
         } else{
-            ThumbnailUtils.createVideoThumbnail(file.path, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
+            ThumbnailUtils.createVideoThumbnail(file.absolutePath, MediaStore.Video.Thumbnails.FULL_SCREEN_KIND);
         }
 
         val thumbnail = ThumbnailUtils.extractThumbnail(bitmap, 120, 160);

@@ -69,6 +69,7 @@ class RtspViewModel : ViewModel() {
         val file = File(temp)
         val fos = FileOutputStream(file)
         val fileDescriptor  = fos.fd
+        Log.d("recordStart","recordStart")
 
         rtspCamera?.startRecord(fileDescriptor)
         _recordStatus.value = true
